@@ -1,0 +1,51 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+  <div class="timeline">
+    <form id="update-form" action="/user/update" method="post">
+        <label for="update-nick">닉네임 변경</label>
+        <input id="update-nick" type="text" name="nick">
+        <button id="update-btn" type="submit" class="btn">변경하기</button>
+    </form>
+    <div class="followings half">
+      <h2>팔로잉 목록</h2>
+      {% if user.Followings %}
+        {% for following in user.Followings %}
+          <div>
+            <input type="hidden" value="{{following.id}}" class="following-id">
+            {{following.nick}} <button class="unfollow">팔로우끊기</button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="followers half">
+      <h2>팔로워 목록</h2>
+      {% if user.Followers %}
+        {% for follower in user.Followers %}
+          <div>{{follower.nick}}</div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+<script>
+  document.querySelectorAll('.unfollow').forEach(function (tag) {
+    tag.addEventListener('click', function () {
+        console.log(tag.parentNode.querySelector('.following-id').value);
+        const userId = tag.parentNode.querySelector('.following-id').value;
+          if (confirm('팔로우를 끊으시겠습니까?')) {
+            axios.delete(`/user/${userId}/follow`)
+                    .then(() => {
+                      location.reload();
+                    })
+                    .catch((err) => {
+                      console.error(err);
+                    });
+          }
+        })
+      }
+    );
+</script>
+{% endblock %}
